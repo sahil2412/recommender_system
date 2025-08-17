@@ -92,25 +92,6 @@ make schedule-materialization-jobs
 ```
 View results in [Hopsworks Serverless](https://rebrand.ly/serverless-github): **Compute → Ingestions**
 
-7. **Deployment Creation with LLM Ranking (Optional)**
-
-Optional step to replace the standard deployments (created in Step 5) with the ones powered by LLMs:
-```bash
-make create-deployments-llm-ranking
-```
-**NOTE**: If the script fails, go to [Hopsworks Serverless](https://rebrand.ly/serverless-github): **Data Science → Deployments**, forcefully stop all the deployments and run again.
-
-> [!WARNING]
-> The LLM Ranking deployment overrides the deployment from **5. Deployment Creation**
-
-Start the Streamlit UI that interfaces the LLM deployment:
-```bash
-make start-ui-llm-ranking
-```
-Accessible at `http://localhost:8501/`
-
-> [!WARNING]
-> The Streamlit UI command is compatible only with its corresponding deployment. For example, running the deployment from **5. Deployment Creation** and `make start-ui-llm-ranking` won't work.
 
 ## Clean Up Resources
 
@@ -146,7 +127,6 @@ Create your own copy of the repository to access GitHub Actions:
 # Use GitHub's UI to fork the repository
 https://github.com/original-repo/name → Your-Username/name
 ```
-[📚 GitHub Fork Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
 
 ### 2. Configure Secrets
 Set up required environment variables as GitHub Actions secrets:
