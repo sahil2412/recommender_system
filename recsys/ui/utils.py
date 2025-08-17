@@ -29,12 +29,29 @@ def process_description(description):
     return details_match.group(1) if details_match else "No details available."
 
 
-def get_item_image_url(item_id, articles_fv):
-    article_feature_view = articles_fv.get_feature_vector({"article_id": item_id})
-    if not article_feature_view:
-        return None
+import logging
 
-    return article_feature_view[-1]
+def get_item_image_url(item_id, articles_fv):
+    """Fetch image URL for an article_id from the feature view, fallback to placeholder if missing."""
+    try:
+        article_feature_view = articles_fv.get_feature_vector({"article_id": item_id})
+        if not article_feature_view:
+            raise ValueError("No features found")
+
+        # Assuming last element is the image URL in your schema
+        image_url = article_feature_view[-1]
+
+        # Extra check in case it's empty or None
+        if not image_url:
+            raise ValueError("Empty image URL")
+
+        return image_url
+
+    except Exception as e:
+        logging.warning(f"Image not found for article {item_id}: {e}")
+        # You can swap this with a local static file if available
+        return "https://via.placeholder.com/150?text=No+Image"
+
 
 
 @st.cache_resource()
