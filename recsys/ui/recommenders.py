@@ -42,14 +42,14 @@ def display_item(item_id, score, articles_fv, customer_id, tracker, source):
     img = fetch_and_process_image(image_url)
 
     if img is None:
-        # fallback if even fetch fails
-        logging.warning(f"Falling back to placeholder image for {item_id}")
-        image_url = PLACEHOLDER_IMAGE
-        img = fetch_and_process_image(image_url)
+        # fallback: just use the placeholder URL directly
+        st.image(PLACEHOLDER_IMAGE, use_column_width=True)
+    else:
+        st.image(img, use_column_width=True)
 
-    st.image(img, use_column_width=True)
     st.write(f"**🎯 Score:** {score:.4f}")
-
+    ...
+    
     # --- View Details button ---
     details_key = f"{source}_details_{item_id}"
     if st.button("📝 View Details", key=details_key):
