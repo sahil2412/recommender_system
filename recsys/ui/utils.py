@@ -16,7 +16,6 @@ def print_header(text, font_size=22):
     st.markdown(res, unsafe_allow_html=True)
 
 
-@st.cache_data()
 PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=No+Image"
 
 def fetch_and_process_image(url, size=(300, 200)):
