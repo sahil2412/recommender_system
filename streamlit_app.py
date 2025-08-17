@@ -115,7 +115,7 @@ def main():
     )
 
     # Page selection
-    page_options = ["Customer Recommendations", "LLM Recommendations"]
+    page_options = ["Customer Recommendations"]
     page_selection = st.sidebar.radio("📑 Choose Page:", page_options)
 
     # Process any pending interactions with notification
@@ -129,8 +129,8 @@ def main():
         customer_recommendations(
             articles_fv, ranking_deployment, query_model_deployment, customer_id
         )
-    else:  # LLM Recommendations
-        handle_llm_page(articles_fv, customer_id)
+#    else:  # LLM Recommendations
+#        handle_llm_page(articles_fv, customer_id)
 
 
 if __name__ == "__main__":
