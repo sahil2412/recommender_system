@@ -161,7 +161,6 @@ Set up required environment variables as GitHub Actions secrets:
 [📚 Set up GitHub Actions Secrets Guide](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions?tool=webui)
 
 <p align="center">
-  <a href="https://decodingml.substack.com/p/33d3273e-b8e3-4d98-b160-c3d239343022">
     <img src="assets/github_actions_secrets.png" alt="GA Secrets" width="800">
   </a>
 </p>
@@ -184,7 +183,6 @@ gh secret set OPENAI_API_KEY
 4. Click "Run workflow"
 
 <p align="center">
-  <a href="https://decodingml.substack.com/p/33d3273e-b8e3-4d98-b160-c3d239343022">
     <img src="assets/github_actions_manual_trigger.png" alt="GA Manual Trigger" width="1000">
   </a>
 </p>
@@ -192,7 +190,6 @@ gh secret set OPENAI_API_KEY
 After triggering the pipeline, you will see it running, signaled by a yellow circle. Click on it to see the progress.
 
 <p align="center">
-  <a href="https://decodingml.substack.com/p/33d3273e-b8e3-4d98-b160-c3d239343022">
     <img src="assets/github_actions_pipeline_progress.png" alt="GA Progress" width="1000">
   </a>
 </p>
@@ -200,7 +197,6 @@ After triggering the pipeline, you will see it running, signaled by a yellow cir
 After it is finished, it should look like this:
 
 <p align="center">
-  <a href="https://decodingml.substack.com/p/33d3273e-b8e3-4d98-b160-c3d239343022">
     <img src="assets/github_actions_pipeline_done.png" alt="GA Done" width="1000">
   </a>
 </p>
