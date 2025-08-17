@@ -4,6 +4,9 @@ from io import BytesIO
 import requests
 import streamlit as st
 from PIL import Image, UnidentifiedImageError
+import requests
+import io
+import logging
 
 from recsys import hopsworks_integration
 from recsys.config import settings
@@ -14,15 +17,30 @@ def print_header(text, font_size=22):
 
 
 @st.cache_data()
-def fetch_and_process_image(image_url, width=200, height=300):
-    try:
-        response = requests.get(image_url)
-        img = Image.open(BytesIO(response.content))
-        img = img.resize((width, height), Image.LANCZOS)
-        return img
-    except (UnidentifiedImageError, requests.RequestException, IOError):
-        return None
+PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=No+Image"
 
+def fetch_and_process_image(url, size=(300, 200)):
+    """Fetch an image from URL, resize it, and return a PIL Image.
+    If fetching fails, return a placeholder image instead.
+    """
+    try:
+        resp = requests.get(url, timeout=5)
+        resp.raise_for_status()
+        img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+        img.thumbnail(size)
+        return img
+    except Exception as e:
+        logging.warning(f"Falling back to placeholder, failed to fetch {url}: {e}")
+        try:
+            # try to fetch placeholder from web
+            resp = requests.get(PLACEHOLDER_IMAGE, timeout=5)
+            img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+            img.thumbnail(size)
+            return img
+        except Exception as e2:
+            logging.error(f"Failed to fetch placeholder image as well: {e2}")
+            # as absolute last fallback, create a blank image
+            return Image.new("RGB", size, color=(200, 200, 200))
 
 def process_description(description):
     details_match = re.search(r"Details: (.+?)(?:\n|$)", description)
