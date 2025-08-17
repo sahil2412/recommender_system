@@ -28,41 +28,54 @@ def initialize_llm_state():
     if "llm_extra_items" not in st.session_state:
         st.session_state.llm_extra_items = {}
 
+import streamlit as st
+import logging
+from recsys.ui.feature_group_updater import get_fg_updater
+from recsys.ui.utils import get_item_image_url, fetch_and_process_image, process_description
+
+PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=No+Image"
 
 def display_item(item_id, score, articles_fv, customer_id, tracker, source):
     """Display a single item with its interactions"""
-    image_url = get_item_image_url(item_id, articles_fv)
+    # --- Image handling ---
+    image_url = get_item_image_url(item_id, articles_fv) or PLACEHOLDER_IMAGE
     img = fetch_and_process_image(image_url)
 
-    if img:
-        st.image(img, use_column_width=True)
-        st.write(f"**🎯 Score:** {score:.4f}")
+    if img is None:
+        # fallback if even fetch fails
+        logging.warning(f"Falling back to placeholder image for {item_id}")
+        image_url = PLACEHOLDER_IMAGE
+        img = fetch_and_process_image(image_url)
 
-        # View Details button
-        details_key = f"{source}_details_{item_id}"
-        if st.button("📝 View Details", key=details_key):
-            tracker.track(customer_id, item_id, "click")
-            with st.expander("Item Details", expanded=True):
-                description = process_description(
-                    articles_fv.get_feature_vector({"article_id": item_id})[-2]
-                )
+    st.image(img, use_column_width=True)
+    st.write(f"**🎯 Score:** {score:.4f}")
+
+    # --- View Details button ---
+    details_key = f"{source}_details_{item_id}"
+    if st.button("📝 View Details", key=details_key):
+        tracker.track(customer_id, item_id, "click")
+        with st.expander("Item Details", expanded=True):
+            try:
+                fv = articles_fv.get_feature_vector({"article_id": item_id})
+                description_raw = fv[-2] if fv and len(fv) >= 2 else None
+                description = process_description(description_raw) if description_raw else "No description available."
                 st.write(description)
+            except Exception as e:
+                logging.error(f"Failed to fetch description for {item_id}: {e}")
+                st.write("⚠️ Description not available.")
 
-        # Buy button
-        buy_key = f"{source}_buy_{item_id}"
-        if st.button("🛒 Buy", key=buy_key):
-            # Track interaction
-            tracker.track(customer_id, item_id, "purchase")
+    # --- Buy button ---
+    buy_key = f"{source}_buy_{item_id}"
+    if st.button("🛒 Buy", key=buy_key):
+        tracker.track(customer_id, item_id, "purchase")
+        fg_updater = get_fg_updater()
+        purchase_data = {"customer_id": customer_id, "article_id": item_id}
 
-            # Insert transaction
-            fg_updater = get_fg_updater()
-            purchase_data = {"customer_id": customer_id, "article_id": item_id}
-
-            if fg_updater.insert_transaction(purchase_data):
-                st.success(f"✅ Item {item_id} purchased!")
-                st.experimental_rerun()
-            else:
-                st.error("Failed to record transaction, but purchase was tracked")
+        if fg_updater.insert_transaction(purchase_data):
+            st.success(f"✅ Item {item_id} purchased!")
+            st.experimental_rerun()
+        else:
+            st.error("❌ Failed to record transaction, but purchase was tracked")
 
 
 def customer_recommendations(
