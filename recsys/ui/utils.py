@@ -17,28 +17,33 @@ def print_header(text, font_size=22):
     st.markdown(res, unsafe_allow_html=True)
 
 
+PLACEHOLDER_IMAGE = os.path.join("assets", "placeholder.png")
+
+
 def fetch_and_process_image(url, size=(300, 200)):
-    """Fetch an image from URL, resize it, and return a PIL Image.
-    If fetching fails, return a placeholder image instead.
+    """
+    Fetch an image from a given URL, resize it, and return a PIL Image.
+    If fetching fails, return the local placeholder instead.
     """
     try:
-        resp = requests.get(url, timeout=5)
-        resp.raise_for_status()
-        img = Image.open(io.BytesIO(resp.content)).convert("RGB")
-        img.thumbnail(size)
-        return img
-    except Exception as e:
-        logging.warning(f"Falling back to placeholder, failed to fetch {url}: {e}")
-        try:
-            # try to fetch placeholder from web
-            resp = requests.get(PLACEHOLDER_IMAGE, timeout=5)
+        if url and url.startswith("http"):
+            resp = requests.get(url, timeout=5)
+            resp.raise_for_status()
             img = Image.open(io.BytesIO(resp.content)).convert("RGB")
             img.thumbnail(size)
             return img
-        except Exception as e2:
-            logging.error(f"Failed to fetch placeholder image as well: {e2}")
-            # as absolute last fallback, create a blank image
-            return Image.new("RGB", size, color=(200, 200, 200))
+    except Exception as e:
+        logging.warning(f"Falling back to placeholder. Failed to fetch {url}: {e}")
+
+    # --- Local fallback ---
+    try:
+        img = Image.open(PLACEHOLDER_IMAGE).convert("RGB")
+        img.thumbnail(size)
+        return img
+    except Exception as e2:
+        logging.error(f"Failed to load local placeholder image: {e2}")
+        # Absolute last fallback: generate a blank gray image
+        return Image.new("RGB", size, color=(200, 200, 200))
 
 def process_description(description):
     details_match = re.search(r"Details: (.+?)(?:\n|$)", description)
