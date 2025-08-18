@@ -1,5 +1,6 @@
 import re
 from io import BytesIO
+import os
 
 import requests
 import streamlit as st
@@ -15,8 +16,6 @@ def print_header(text, font_size=22):
     res = f'<span style="font-size: {font_size}px;">{text}</span>'
     st.markdown(res, unsafe_allow_html=True)
 
-
-PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=No+Image"
 
 def fetch_and_process_image(url, size=(300, 200)):
     """Fetch an image from URL, resize it, and return a PIL Image.
@@ -48,26 +47,23 @@ def process_description(description):
 
 import logging
 
+ASSETS_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "assets")
+LOCAL_PLACEHOLDER = os.path.join(ASSETS_DIR, "placeholder.png")
+
 def get_item_image_url(item_id, articles_fv):
-    """Fetch image URL for an article_id from the feature view, fallback to placeholder if missing."""
     try:
         article_feature_view = articles_fv.get_feature_vector({"article_id": item_id})
         if not article_feature_view:
             raise ValueError("No features found")
 
-        # Assuming last element is the image URL in your schema
         image_url = article_feature_view[-1]
-
-        # Extra check in case it's empty or None
         if not image_url:
             raise ValueError("Empty image URL")
 
         return image_url
-
     except Exception as e:
-        logging.warning(f"Image not found for article {item_id}: {e}")
-        # You can swap this with a local static file if available
-        return "https://via.placeholder.com/150?text=No+Image"
+        logging.warning(f"Image not found for article {item_id}: {e}. Using local placeholder.")
+        return LOCAL_PLACEHOLDER
 
 
 
