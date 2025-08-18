@@ -16,6 +16,7 @@ from .utils import (
     get_item_image_url,
     print_header,
     process_description,
+    PLACEHOLDER_IMAGE,
 )
 
 
@@ -33,12 +34,11 @@ import logging
 from recsys.ui.feature_group_updater import get_fg_updater
 from recsys.ui.utils import get_item_image_url, fetch_and_process_image, process_description
 
-PLACEHOLDER_IMAGE = "https://via.placeholder.com/300x200?text=No+Image"
 
 def display_item(item_id, score, articles_fv, customer_id, tracker, source):
     """Display a single item with its interactions"""
     # --- Image handling ---
-    image_url = get_item_image_url(item_id, articles_fv) or PLACEHOLDER_IMAGE
+    image_url = get_item_image_url(item_id, articles_fv)
     img = fetch_and_process_image(image_url)
 
     if img is None:
